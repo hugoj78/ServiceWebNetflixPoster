@@ -1,24 +1,32 @@
-version: '3.3'
+version: '3.9'
 services:
-  db:
+  db_poster:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_DATABASE: 'db'
+      MYSQL_DATABASE: 'db_poster'
       MYSQL_USER: 'user'
       MYSQL_PASSWORD: 'password'
       MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_TCP_PORT: 3308
     ports:
-      - '3306:3306'
+      - '3308:3308'
     expose:
-      - '3306'
+      - '3308'
     volumes:
-      - my-db:/var/lib/mysql
+      - my-db_poster:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
   web:
     build: .
     environment:
-      DB_URI: "mysql+pymysql://user:password@db:3306/db"
+      DB_URI: "mysql+pymysql://user:password@db_poster:3308/db_poster"
     ports :
-      - 5000:5000
+      - 8091:8091
+    depends_on:
+      db_poster:
+        condition: service_healthy
 volumes:
-  my-db:
+  my-db_poster:
