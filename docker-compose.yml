@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.7'
 services:
   db_poster:
     image: mysql:5.7
@@ -15,6 +15,8 @@ services:
       - '3308'
     volumes:
       - my-db_poster:/var/lib/mysql
+    networks:
+      - mynetwork
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 10s
@@ -26,12 +28,12 @@ services:
     ports :
       - 8091:8091
     networks:
-      - default
+      - mynetwork
     depends_on:
       db_poster:
         condition: service_healthy
 volumes:
   my-db_poster:
-
 networks:
-  default:
+  mynetwork:
+    name: "mynetwork"
